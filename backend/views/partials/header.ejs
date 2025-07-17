@@ -1,0 +1,17 @@
+<header>
+  <nav class="navbar">
+    <div class="logo">
+      <a href="/">💳 RazorPay Demo</a>
+    </div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <% if (user) { %>
+        <li><a href="/premium" class="<%= user.isPremium ? 'premium' : '' %>">Premium</a></li>
+        <li><a href="/logout">Logout</a></li>
+      <% } else { %>
+        <li><a href="/signup">Signup</a></li>
+        <li><a href="/login">Login</a></li>
+      <% } %>
+    </ul>
+  </nav>
+</header>

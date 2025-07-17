@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🎉 Premium Unlocked</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="premium-page">
+  <%- include("partials/header") %>
+
+  <div class="premium-container">
+    <h1 class="golden-heading">🌟 Premium Access Unlocked!</h1>
+    <p class="tagline">Welcome, <%= user.fullName %> — you're officially a premium member!</p>
+
+    <div class="benefits">
+      <h3>🚀 Benefits You've Just Unlocked:</h3>
+      <ul>
+        <li>✔️ Ad-Free Experience</li>
+        <li>🔓 Early Access Features</li>
+        <li>📞 Priority Support</li>
+        <li>🏅 Golden Premium Badge</li>
+      </ul>
+    </div>
+
+    <div class="fun-section">
+      <h3>🎓 Tech Fact of the Day</h3>
+      <p><%= fact %></p>
+
+      <h3>💡 Motivational Quote</h3>
+      <p><%= quote %></p>
+
+      <h3>😂 Dev Joke</h3>
+      <p><%= joke %></p>
+    </div>
+
+    <section class="premium-note">
+  <p>Your subscription is active from <strong><%= user.startDate.toDateString() %></strong> to <strong><%= user.endDate.toDateString() %></strong>.</p>
+</section>
+
+    <div class="footer">
+       <a href="/" class="btn btn-back">← Back to Home</a>
+      <a href="/logout" class="btn-logout">Logout</a>
+    </div>
+  </div>
+  <%- include("partials/footer") %>
+</body>
+</html>
