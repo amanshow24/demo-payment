@@ -74,7 +74,9 @@ app.get("/", (req, res) => res.redirect("/plans"));
 app.use("/", require("./routes/authRoutes"));
 app.use("/payment", require("./routes/paymentRoutes"));
 
-
+app.get("/health", (req,res)=> {
+res.status(200).send("OK");
+})
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
