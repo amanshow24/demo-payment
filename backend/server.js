@@ -5,6 +5,7 @@ const cors = require("cors");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
+const morgan = require("morgan");
 const setUser = require("./middleware/setUser");
 
 dotenv.config();
@@ -49,6 +50,7 @@ app.use(
   })
 );
 
+app.use(morgan("tiny"));
 app.use(cors()); // Allow frontend communication (local)
 app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse form data
@@ -64,10 +66,8 @@ app.set("views", path.join(__dirname, "views"));
 
 
 mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-}).then(() => console.log("✅ MongoDB Connected"))
-  .catch(err => console.error("❌ MongoDB Error:", err));
+}).then(() => console.log("✅ MongoDB Atlas Connected"))
+  .catch(err => console.error("❌ MongoDB Atlas Error:", err));
 
 
 app.get("/", (req, res) => res.redirect("/plans"));
@@ -77,6 +77,12 @@ app.use("/payment", require("./routes/paymentRoutes"));
 app.get("/health", (req,res)=> {
 res.status(200).send("OK");
 })
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
+});
+
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
