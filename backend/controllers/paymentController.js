@@ -1,10 +1,11 @@
 const razorpay = require("../utils/razorpay");
 const crypto = require("crypto");
 const User = require("../models/User");
+const moment = require("moment-timezone");
 
 const PLAN_IDS = {
-  weekly: process.env.RAZORPAY_WEEKLY_ID ,     // ← Your real Razorpay Plan ID for ₹2/week
-  monthly: process.env.RAZORPAY_MONTHLY_ID , // ← Your real Razorpay Plan ID for ₹5/month
+  weekly: process.env.RAZORPAY_WEEKLY_ID,
+  monthly: process.env.RAZORPAY_MONTHLY_ID,
 };
 
 exports.createSubscription = async (req, res) => {
@@ -19,7 +20,7 @@ exports.createSubscription = async (req, res) => {
     const subscription = await razorpay.subscriptions.create({
       plan_id: PLAN_IDS[plan],
       customer_notify: 1,
-      total_count: 1, // Billing happens automatically every period (weekly/monthly)
+      total_count: 1, // One-time payment only
     });
 
     res.json({
@@ -27,48 +28,53 @@ exports.createSubscription = async (req, res) => {
       razorpayKey: process.env.RAZORPAY_KEY_ID,
     });
   } catch (error) {
-    console.error("Subscription Error:", error);
+    console.error("❌ Subscription Creation Error for user ID:", userId, error);
     res.status(500).json({ error: "Subscription failed" });
   }
 };
 
 exports.verifyPayment = async (req, res) => {
-  const {
-    razorpay_payment_id,
-    razorpay_subscription_id,
-    razorpay_signature,
-  } = req.body;
+  try {
+    const {
+      razorpay_payment_id,
+      razorpay_subscription_id,
+      razorpay_signature,
+    } = req.body;
 
-  const generated_signature = crypto
-    .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-    .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
-    .digest("hex");
+    const generated_signature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+      .update(`${razorpay_payment_id}|${razorpay_subscription_id}`)
+      .digest("hex");
 
-  if (generated_signature === razorpay_signature) {
-    const user = await User.findById(req.user.id);
-    const startDate = new Date();
-    const endDate = new Date();
-
-    // Save end date based on which plan user bought
-    const boughtWeekly = user.subscription_id?.includes("weekly") || PLAN_IDS.weekly === razorpay_subscription_id;
-    const boughtMonthly = user.subscription_id?.includes("monthly") || PLAN_IDS.monthly === razorpay_subscription_id;
-
-    if (boughtWeekly) {
-      endDate.setDate(endDate.getDate() + 7);
-    } else if (boughtMonthly) {
-      endDate.setMonth(endDate.getMonth() + 1);
-    } else {
-      endDate.setMonth(endDate.getMonth() + 1); // Default to monthly
+    if (generated_signature !== razorpay_signature) {
+      return res.status(400).json({ success: false, message: "Invalid Signature" });
     }
 
+    // 2️⃣ Signature is valid → Fetch subscription to determine the plan
+    const subscription = await razorpay.subscriptions.fetch(razorpay_subscription_id);
+    const planId = subscription.plan_id;
+
+    const startDate = moment.tz("Asia/Kolkata");
+    const endDate = moment.tz(startDate, "Asia/Kolkata");
+
+    if (planId === PLAN_IDS.weekly) {
+      endDate.add(7, "days");
+    } else if (planId === PLAN_IDS.monthly) {
+      endDate.add(1, "month");
+    } else {
+      endDate.add(1, "month"); // default fallback
+    }
+
+    const user = await User.findById(req.user.id);
     user.isPremium = true;
     user.subscription_id = razorpay_subscription_id;
-    user.startDate = startDate;
-    user.endDate = endDate;
+    user.startDate = startDate.toDate();
+    user.endDate = endDate.toDate();
     await user.save();
 
     return res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Payment Verification Error for user ID:", req.user.id, err);
+    return res.status(500).json({ success: false, message: "Payment verification failed" });
   }
-
-  return res.status(400).json({ success: false, message: "Invalid Signature" });
 };

@@ -4,6 +4,7 @@ const auth = require("../middleware/auth");
 const checkPremium = require("../middleware/checkPremium");
 const { getSignup, getLogin, signup, login, logout } = require("../controllers/authController");
 const User = require("../models/User");
+const moment = require("moment-timezone");
 
 // 🧠 Fun content pools for Premium Page
 const techFacts = [
@@ -39,11 +40,23 @@ router.get("/logout", logout);
 
 // 💰 Subscription Plans Page
 router.get("/plans", auth, async (req, res) => {
-  const user = await User.findById(req.user.id);
-  if (user.isPremium && new Date(user.endDate) > new Date()) {
-    return res.redirect("/premium");
+  try {
+    const user = await User.findById(req.user.id);
+    const now = moment.tz("Asia/Kolkata");
+    const endDate = moment.tz(user.endDate, "Asia/Kolkata");
+
+    if (user.isPremium && endDate.isAfter(now)) {
+      return res.redirect("/premium");
+    }
+    res.render("plans", { 
+      razorpayKey: process.env.RAZORPAY_KEY_ID,
+      expiredSoon: user.isPremium && endDate.diff(now, "days") <= 3,
+      endDate: endDate.format("YYYY-MM-DD HH:mm:ss")
+    });
+  } catch (err) {
+    console.error("Error in /plans route for user ID:", req.user?.id, err);
+    res.redirect("/error"); // Redirect to a custom error page
   }
-  res.render("plans", { razorpayKey: process.env.RAZORPAY_KEY_ID });
 });
 
 // 🌟 Premium Content Page
@@ -52,7 +65,14 @@ router.get("/premium", auth, checkPremium, (req, res) => {
   const joke = devJokes[Math.floor(Math.random() * devJokes.length)];
   const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
-  res.render("premium", { user: req.user, fact, joke, quote });
+  res.render("premium", {
+    user: req.user,
+    fact,
+    joke,
+    quote,
+    startDate: moment.tz(req.user.startDate, "Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"),
+    endDate: moment.tz(req.user.endDate, "Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"),
+  });
 });
 
 // 🚫 Expired Subscription Page

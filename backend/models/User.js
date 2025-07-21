@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema({
   isPremium: { type: Boolean, default: false },
   subscription_id: String,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 });
 
 module.exports = mongoose.model("User", userSchema);

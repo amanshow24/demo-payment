@@ -1,48 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Choose a Plan</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/style.css" />
-
-    <!-- Razorpay CDN -->
-    <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
-    <script src="/js/subscribe.js" defer></script>
-
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        overflow-x: hidden;
-      }
-
-      body > *:first-child {
-        margin-top: 0 !important;
-      }
-    </style>
-  </head>
-
-  <body class="plans-page">
-    <%- include("partials/header") %>
-
+<head>
+  <meta charset="UTF-8" />
+  <title>Choose a Plan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="https://checkout.razorpay.com/v1/checkout.js" defer></script>
+  <script src="/js/subscribe.js" defer></script>
+</head>
+<body>
+  <%- include("partials/header") %>
+  <main class="plans-page">
+    <% if (expiredSoon) { %>
+      <p class="warning">Your premium expires soon! Renew before <%= endDate %>.</p>
+    <% } %>
     <div class="plans-container">
       <h2 class="plans-title">🚀 Choose Your Premium Plan</h2>
-
       <div class="plans">
         <div class="plan" data-plan="weekly">
-          <h3>₹2 / Week</h3>
+          <h3>₹1 / Week</h3>
           <button>Select Plan</button>
         </div>
-
         <div class="plan" data-plan="monthly">
-          <h3>₹5 / Month</h3>
+          <h3>₹2 / Month</h3>
           <button>Select Plan</button>
         </div>
       </div>
     </div>
-
-    <%- include("partials/footer") %>
-  </body>
+  </main>
+  <%- include("partials/footer") %>
+</body>
 </html>

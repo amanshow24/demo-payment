@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const moment = require("moment-timezone");
 
 // GET: Signup page
 exports.getSignup = (req, res) => {
@@ -32,12 +33,11 @@ exports.signup = async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true }); // Ensure token is set correctly
 
-    // ⏩ New users are taken to plans page by default
     res.redirect("/plans");
   } catch (err) {
-    console.error("Signup error:", err);
+    console.error("Signup error for email:", email, err);
     res.render("signup", { error: "Something went wrong. Please try again." });
   }
 };
@@ -58,19 +58,20 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, { httpOnly: true }); // Ensure token is set correctly
 
-    // ✅ Smart redirect based on subscription status
-    const now = new Date();
-    if (user.isPremium && new Date(user.endDate) > now) {
+    const now = moment.tz("Asia/Kolkata");
+    const endDate = moment.tz(user.endDate, "Asia/Kolkata");
+
+    if (user.isPremium && endDate.isAfter(now)) {
       return res.redirect("/premium");
-    } else if (user.isPremium && new Date(user.endDate) <= now) {
+    } else if (user.isPremium && endDate.isSameOrBefore(now)) {
       return res.redirect("/expired");
     } else {
       return res.redirect("/plans");
     }
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Login error for email:", email, err);
     res.render("login", { error: "Something went wrong. Please try again." });
   }
 };

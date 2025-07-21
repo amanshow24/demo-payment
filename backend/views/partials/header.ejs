@@ -3,15 +3,26 @@
     <div class="logo">
       <a href="/">💳 RazorPay Demo</a>
     </div>
-    <ul class="nav-links">
-      <li><a href="/">Home</a></li>
+    <div class="nav-container">
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <% if (user) { %>
+          <li><a href="/premium" class="<%= user.isPremium ? 'premium' : '' %>">Premium</a></li>
+          <li><a href="/logout">Logout</a></li>
+        <% } else { %>
+          <li><a href="/signup">Signup</a></li>
+          <li><a href="/login">Login</a></li>
+        <% } %>
+      </ul>
       <% if (user) { %>
-        <li><a href="/premium" class="<%= user.isPremium ? 'premium' : '' %>">Premium</a></li>
-        <li><a href="/logout">Logout</a></li>
+        <div class="user-greeting">
+          Hi, <%= user.email %>!
+        </div>
       <% } else { %>
-        <li><a href="/signup">Signup</a></li>
-        <li><a href="/login">Login</a></li>
+        <div class="user-greeting">
+          Hi, Guest!
+        </div>
       <% } %>
-    </ul>
+    </div>
   </nav>
 </header>

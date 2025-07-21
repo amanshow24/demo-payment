@@ -2,30 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🔒 Subscription Expired</title>
+  <title>Subscription Expired</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body class="expired-page">
+<body>
   <%- include("partials/header") %>
-
-  <div class="expired-card">
-    <div class="locked-icon">🔒</div>
-    <h1>Oops! Your Premium Access Has Expired</h1>
-    <p>Your subscription ended. But don’t worry — you can renew anytime to regain access to:</p>
-
-    <ul class="expired-benefits">
-      <li>✔️ Ad-Free Experience</li>
-      <li>📁 Premium Resource Vault</li>
-      <li>🎥 Exclusive Tutorials</li>
-      <li>🏅 Premium Badge & Perks</li>
-    </ul>
-
-    <a href="/plans" class="btn-renew">Renew Now</a>
-
-
-  </div>
-
-   <%- include("partials/footer") %>
+  <main class="expired-page">
+    <div class="expired-card">
+      <div class="locked-icon">🔒</div>
+      <h1>Oops! Your Premium Access Has Expired</h1>
+      <p>Your subscription ended. But don’t worry — you can renew anytime to regain access to:</p>
+      <ul class="expired-benefits">
+        <li>✔️ Ad-Free Experience</li>
+        <li>📁 Premium Resource Vault</li>
+        <li>🎥 Exclusive Tutorials</li>
+        <li>🏅 Premium Badge & Perks</li>
+      </ul>
+      <a href="/plans" class="btn-renew">Renew Now</a>
+    </div>
+  </main>
+  <%- include("partials/footer") %>
 </body>
 </html>
