@@ -96,6 +96,7 @@ app.get('/privacy', (req, res) => res.render('policies/privacy'));
 app.get('/terms', (req, res) => res.render('policies/terms'));
 app.get('/refund', (req, res) => res.render('policies/refund'));
 app.get('/contact', (req, res) => res.render('policies/contact'));
+app.get('/shipping', (req, res) => res.render('policies/shipping'));
 
 app.use((err, req, res, next) => {
   console.error("Server error at", moment.tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"), err.stack);
