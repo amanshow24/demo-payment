@@ -6,7 +6,7 @@ const { getSignup, getLogin, signup, login, logout } = require("../controllers/a
 const User = require("../models/User");
 const moment = require("moment-timezone");
 
-// 🧠 Fun content pools for Premium Page
+// Fun content pools for Premium Page
 const techFacts = [
   "💾 The first computer bug was an actual moth.",
   "🟨 JavaScript was created in just 10 days.",
@@ -31,35 +31,35 @@ const quotes = [
   "“Simplicity is the soul of efficiency.” – Austin Freeman",
 ];
 
-// ✅ Auth routes (Signup / Login / Logout)
+// Auth routes (Signup / Login / Logout)
+
 router.get("/signup", getSignup);
 router.post("/signup", signup);
 router.get("/login", getLogin);
 router.post("/login", login);
 router.get("/logout", logout);
 
-// 💰 Subscription Plans Page
+// Subscription Plans Page
 router.get("/plans", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = req.user; // Use middleware-provided user
     const now = moment.tz("Asia/Kolkata");
-    const endDate = moment.tz(user.endDate, "Asia/Kolkata");
-
-    if (user.isPremium && endDate.isAfter(now)) {
+    const endDate = user.endDate ? moment.tz(user.endDate, "Asia/Kolkata") : null;
+    if (user.isPremium && endDate && endDate.isAfter(now)) {
       return res.redirect("/premium");
     }
     res.render("plans", { 
       razorpayKey: process.env.RAZORPAY_KEY_ID,
-      expiredSoon: user.isPremium && endDate.diff(now, "days") <= 3,
-      endDate: endDate.format("YYYY-MM-DD HH:mm:ss")
+      expiredSoon: user.isPremium && endDate && endDate.diff(now, "days") <= 3,
+      endDate: endDate ? endDate.format("YYYY-MM-DD HH:mm:ss") : null
     });
   } catch (err) {
     console.error("Error in /plans route for user ID:", req.user?.id, err);
-    res.redirect("/error"); // Redirect to a custom error page
+    res.redirect("/error");
   }
 });
 
-// 🌟 Premium Content Page
+// Premium Content Page
 router.get("/premium", auth, checkPremium, (req, res) => {
   const fact = techFacts[Math.floor(Math.random() * techFacts.length)];
   const joke = devJokes[Math.floor(Math.random() * devJokes.length)];
@@ -75,9 +75,14 @@ router.get("/premium", auth, checkPremium, (req, res) => {
   });
 });
 
-// 🚫 Expired Subscription Page
+// Expired Subscription Page
 router.get("/expired", (req, res) => {
   res.render("expired");
+});
+
+// Error Page
+router.get("/error", (req, res) => {
+  res.render("error");
 });
 
 module.exports = router;

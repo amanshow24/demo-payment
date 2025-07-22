@@ -70,6 +70,8 @@ app.use(express.json()); // Parse JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parse form data
 app.use(cookieParser()); // Parse cookies
 
+
+
 app.use(setUser); // Attach logged-in user globally to res.locals
 
 app.use(express.static(path.join(__dirname, "../public")));
@@ -97,6 +99,10 @@ app.get('/terms', (req, res) => res.render('policies/terms'));
 app.get('/refund', (req, res) => res.render('policies/refund'));
 app.get('/contact-us', (req, res) => res.render('policies/contact'));
 app.get('/shipping-policy', (req, res) => res.render('policies/shipping'));
+
+app.get("/error", (req, res) => {
+  res.render("error");
+});
 
 app.use((err, req, res, next) => {
   console.error("Server error at", moment.tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss"), err.stack);

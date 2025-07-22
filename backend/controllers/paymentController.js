@@ -8,6 +8,7 @@ const PLAN_IDS = {
   monthly: process.env.RAZORPAY_MONTHLY_ID,
 };
 
+
 exports.createSubscription = async (req, res) => {
   try {
     const { plan } = req.body;
@@ -20,16 +21,18 @@ exports.createSubscription = async (req, res) => {
     const subscription = await razorpay.subscriptions.create({
       plan_id: PLAN_IDS[plan],
       customer_notify: 1,
-      total_count: 1, // One-time payment only
+      total_count: 1
     });
 
-    res.json({
-      subscription_id: subscription.id,
-      razorpayKey: process.env.RAZORPAY_KEY_ID,
-    });
+res.json({
+  subscription_id: subscription.id,
+  razorpayKey: process.env.RAZORPAY_KEY_ID,
+  userName: req.user.fullName,
+  userEmail: req.user.email
+});
   } catch (error) {
     console.error("❌ Subscription Creation Error for user ID:", userId, error);
-    res.status(500).json({ error: "Subscription failed" });
+    res.status(500).json({ error: "Failed to create subscription." });
   }
 };
 

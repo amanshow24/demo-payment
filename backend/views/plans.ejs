@@ -11,6 +11,8 @@
 <body>
   <%- include("partials/header") %>
   <main class="plans-page">
+ 
+
     <% if (expiredSoon) { %>
       <p class="warning">Your premium expires soon! Renew before <%= endDate %>.</p>
     <% } %>

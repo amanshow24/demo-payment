@@ -600,3 +600,31 @@ header {
   max-width: 800px; /* Matches .policy-container */
   margin: auto; /* Center if not already centered */
 }
+
+
+
+/* In public/css/style.css */
+.error-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 200px); /* Adjust for header/footer */
+}
+.error-card {
+  text-align: center;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: #3399cc; /* Match Razorpay theme */
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+}
+.btn-back {
+  margin-top: 1rem;
+}
